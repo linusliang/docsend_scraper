@@ -143,7 +143,6 @@ def serve_front_page():
 
 # run the app.
 if __name__ == "__main__":
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    application.debug = True
+    # Setting debug to True enables debug output.
+    application.debug = bool(os.getenv("DEBUG"))
     application.run(host='0.0.0.0')
