@@ -138,7 +138,7 @@ def savepdf(url="", emailad="", emailpass=""):
 
 
 @application.route('/')
-def hello_world():
+def serve_front_page():
     return render_template('index.html')
 
 # run the app.
