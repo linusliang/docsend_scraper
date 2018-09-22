@@ -96,28 +96,25 @@ def load_pages(browser):
     """Clicks right until no blank pages. check until pages stabilizes"""
     is_stable = False
     browser.switch_to_active_element().send_keys(Keys.RIGHT)
-    pages = []
+    urls = []
     while not is_stable:
         browser.switch_to_active_element().send_keys(Keys.RIGHT)
         # not sure why this is random...
         time.sleep(0.4 + random.randint(1, 100) / 100)
         pages = browser.find_elements_by_css_selector(".preso-view.page-view")
-        urls = []
-        for x in pages:
-            urls.append(x.get_attribute("src"))
+        urls = [page.get_attribute("src") for page in pages]
         if any("blank.gif" in s for s in urls):
             is_stable = False
         else:
             is_stable = True
 
-    return pages
+    return urls
 
 
-def save_pages(req_id, browser, pages):
+def save_pages(req_id, browser, urls):
     """Save each page as a png and return a list of paths to the saved images"""
     image_paths = []
-    for page_num, page in enumerate(pages, 1):
-        url = page.get_attribute("src")
+    for page_num, url in enumerate(urls, 1):
         browser.get(url)
         image_path = f"{IMAGE_DIR}/{req_id}_{page_num}.png"
         time.sleep(1)
@@ -142,8 +139,8 @@ def savepdf(url="", emailad="", emailpass=""):
     browser = setup_browser()
     load_first_page(browser, url)
     send_auth(browser, emailad, emailpass)
-    pages = load_pages(browser)
-    image_paths = save_pages(req_id, browser, pages)
+    urls = load_pages(browser)
+    image_paths = save_pages(req_id, browser, urls)
 
     im = Image.open(image_paths[0])
     wheight = im.size[0]
