@@ -90,6 +90,27 @@ def send_auth(browser, email, password):
     time.sleep(1)
 
 
+def load_pages(browser):
+    """Clicks right until no blank pages. check until pages stabilizes"""
+    is_stable = False
+    browser.switch_to_active_element().send_keys(Keys.RIGHT)
+    pages = []
+    while not is_stable:
+        browser.switch_to_active_element().send_keys(Keys.RIGHT)
+        # not sure why this is random...
+        time.sleep(0.4 + random.randint(1, 100) / 100)
+        pages = browser.find_elements_by_css_selector(".preso-view.page-view")
+        urls = []
+        for x in pages:
+            urls.append(x.get_attribute("src"))
+        if any("blank.gif" in s for s in urls):
+            is_stable = False
+        else:
+            is_stable = True
+
+    return pages
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
@@ -102,23 +123,8 @@ def savepdf(url="", emailad="", emailpass=""):
     browser = setup_browser()
     load_first_page(browser, url)
     send_auth(browser, emailad, emailpass)
+    pages = load_pages(browser)
 
-    exitflag = 0
-    browser.switch_to_active_element().send_keys(Keys.RIGHT)
-    
-    while exitflag == 0:
-        #click right until no blank pagescheck until pages stabilizes
-        browser.switch_to_active_element().send_keys(Keys.RIGHT)
-        time.sleep(0.4+random.randint(1,100)/100)
-        pages = browser.find_elements_by_css_selector(".preso-view.page-view")
-        urls = []
-        for x in pages:
-            urls.append(x.get_attribute("src"))
-        if any("blank.gif" in s for s in urls):
-            exitflag = 0
-        else:
-            exitflag = 1
-            
     urls = []
     for x in pages:
         urls.append(x.get_attribute("src"))
