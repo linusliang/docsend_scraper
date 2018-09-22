@@ -13,6 +13,11 @@ import platform
 import time
 import random
 
+
+# Setting debug to True enables debug output.
+DEBUG_FLAG = bool(os.getenv("DEBUG"))
+
+
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
 bootstrap = Bootstrap(application)
@@ -27,7 +32,8 @@ def trim(im):
 
 def setup_browser():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    if DEBUG_FLAG:
+        chrome_options.add_argument("--headless")
     driver_path = './chromedriver' if platform.system() == "Darwin" else './chromedriver_linux'
     return webdriver.Chrome(driver_path, chrome_options=chrome_options)
 
@@ -145,6 +151,5 @@ def serve_front_page():
 
 # run the app.
 if __name__ == "__main__":
-    # Setting debug to True enables debug output.
-    application.debug = bool(os.getenv("DEBUG"))
+    application.debug = DEBUG_FLAG
     application.run(host='0.0.0.0')
