@@ -20,6 +20,7 @@ from PIL import Image, ImageChops
 
 # Setting debug to True enables debug output.
 DEBUG_FLAG = bool(os.getenv("DEBUG"))
+IMAGE_DIR = os.getenv("IMAGE_DIR", 'images')
 
 
 # EB looks for an 'application' callable by default.
@@ -118,7 +119,7 @@ def save_pages(req_id, browser, pages):
     for page_num, page in enumerate(pages, 1):
         url = page.get_attribute("src")
         browser.get(url)
-        image_path = f"{req_id}_{page_num}.png"
+        image_path = f"{IMAGE_DIR}/{req_id}_{page_num}.png"
         time.sleep(1)
         browser.save_screenshot(image_path)
         im = Image.open(image_path)
@@ -178,4 +179,5 @@ if __name__ == "__main__":
     application.debug = DEBUG_FLAG
     if DEBUG_FLAG:
         logging.root.setLevel(logging.DEBUG)
+    os.makedirs(IMAGE_DIR, exist_ok=True)
     application.run(host='0.0.0.0')
