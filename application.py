@@ -112,6 +112,23 @@ def load_pages(browser):
     return pages
 
 
+def save_pages(req_id, browser, pages):
+    """Save each page as a png and return a list of paths to the saved images"""
+    image_paths = []
+    for page_num, page in enumerate(pages, 1):
+        url = page.get_attribute("src")
+        browser.get(url)
+        image_path = f"{req_id}_{page_num}.png"
+        time.sleep(1)
+        browser.save_screenshot(image_path)
+        im = Image.open(image_path)
+        trimmed_im = trim(im)
+        im.close()
+        trimmed_im.save(image_path)
+        image_paths.append(image_path)
+    return image_paths
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
@@ -125,40 +142,21 @@ def savepdf(url="", emailad="", emailpass=""):
     load_first_page(browser, url)
     send_auth(browser, emailad, emailpass)
     pages = load_pages(browser)
+    image_paths = save_pages(req_id, browser, pages)
 
-    urls = []
-    for x in pages:
-        urls.append(x.get_attribute("src"))
-        
-    c = 1
-    for x in urls:
-        browser.get(x)
-        browser.save_screenshot("AX"+str(c)+".png")
-        c = c+1
-        
-    imagelist = []
-    for i in range(1,c):
-        imagelist.append("AX"+str(i)+".png")
-     
-    time.sleep(10)   
-    for img in imagelist:
-        im = Image.open(img)
-        im = trim(im)
-        im.save(img)
-    
-    im = Image.open(imagelist[0])
+    im = Image.open(image_paths[0])
     wheight = im.size[0]
     wwidth = im.size[1]
-    im.close()    
+    im.close()
     
     pdf = FPDF("L","pt",[wwidth,wheight])
     pdf.set_margins(0,0,0)
     
-    for image in imagelist:
+    for image in image_paths:
         pdf.add_page()
         pdf.image(image,0,0)
         
-    for i in (imagelist):
+    for i in (image_paths):
         os.remove(i)
     
     cdir = os.getcwd()        
