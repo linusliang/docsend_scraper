@@ -1,5 +1,12 @@
+import os
+import platform
+import time
+import random
+import logging
+
 from flask import Flask, render_template, request, make_response
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,10 +15,6 @@ from selenium.webdriver.common.keys import Keys
 from flask_bootstrap import Bootstrap
 from fpdf import FPDF
 from PIL import Image, ImageChops
-import os
-import platform
-import time
-import random
 
 
 # Setting debug to True enables debug output.
@@ -53,6 +56,21 @@ def normalize_url(url_or_id):
     return f'https://docsend.com/view/{id_}', id_
 
 
+def load_first_page(browser, url):
+    browser.get(url)
+    time.sleep(2)
+    try:
+        element = WebDriverWait(browser, 4).until(
+            EC.presence_of_element_located((By.ID, "youtube-modal"))
+        )
+    except TimeoutException as err:
+        logging.error("failed")
+        if browser.title == '404 Page Not Found':
+            raise ApplicationError(f'`{browser.current_url}` returned a 404')
+        else:
+            raise
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
@@ -63,16 +81,8 @@ def savepdf(url="", emailad="", emailpass=""):
 
     url, id_ = normalize_url(url)
     browser = setup_browser()
+    load_first_page(browser, url)
 
-    browser.get(url)
-    time.sleep(2)
-    try:
-        element = WebDriverWait(browser, 4).until(
-            EC.presence_of_element_located((By.ID, "youtube-modal"))
-        )
-    except:
-        print("failed")    
-    
     # Check if there's email input
     # Check if there's password input
     
