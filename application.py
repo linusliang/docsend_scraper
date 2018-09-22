@@ -1,7 +1,5 @@
-from flask import Flask, render_template, request, redirect, make_response
-from flask import send_file
+from flask import Flask, render_template, request, make_response
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -10,7 +8,6 @@ from selenium.webdriver.common.keys import Keys
 from flask_bootstrap import Bootstrap
 from fpdf import FPDF
 from PIL import Image, ImageChops
-import string
 import os
 import platform
 import time
