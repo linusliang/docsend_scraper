@@ -3,6 +3,7 @@ import platform
 import time
 import random
 import logging
+import uuid
 
 from flask import Flask, render_template, request, make_response
 from selenium import webdriver
@@ -114,7 +115,7 @@ def load_pages(browser):
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
-    # Check if it exists
+    req_id = uuid.uuid4()
     url = request.form['url']
     emailad = request.form['emailad'].encode("ascii")
     emailpass = request.form['emailpass'].encode("ascii")
