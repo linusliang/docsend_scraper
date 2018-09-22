@@ -35,7 +35,7 @@ def trim(im):
 
 def setup_browser():
     chrome_options = Options()
-    if DEBUG_FLAG:
+    if not DEBUG_FLAG:
         chrome_options.add_argument("--headless")
     driver_path = './chromedriver' if platform.system() == "Darwin" else './chromedriver_linux'
     return webdriver.Chrome(driver_path, chrome_options=chrome_options)
