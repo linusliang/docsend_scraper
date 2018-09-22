@@ -24,6 +24,14 @@ def trim(im):
     if bbox:
         return im.crop(bbox)
 
+
+def setup_browser():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver_path = './chromedriver' if platform.system() == "Darwin" else './chromedriver_linux'
+    return webdriver.Chrome(driver_path, chrome_options=chrome_options)
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
@@ -35,13 +43,7 @@ def savepdf(url="", emailad="", emailpass=""):
     loc = url.rfind('/')
     idname = url[24+1:]+'.pdf'
     
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-
-    if platform.system() == "Darwin":
-        browser = webdriver.Chrome(r'./chromedriver')
-    else:
-        browser = webdriver.Chrome(r'./chromedriver_linux', chrome_options=chrome_options)
+    browser = setup_browser()
 
     loc = str.find(url,"view")
     ID = url[loc+5:]
