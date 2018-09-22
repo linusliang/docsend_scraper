@@ -71,14 +71,23 @@ def load_first_page(browser, url):
             raise
 
 
-def send_email(browser, email):
-    """Check if there's email input"""
+def send_auth(browser, email, password):
+    """Send email and password input if required"""
     try:
         email_element = browser.find_element_by_name('visitor[email]')
         email_element.send_keys(email)
         time.sleep(1)
     except:
         logging.debug("no e-mail required")
+        return
+    try:
+        pass_element = browser.find_element_by_name('visitor[passcode]')
+        pass_element.send_keys(password)
+    except:
+        logging.debug("no password required")
+    email_element.send_keys(Keys.TAB)
+    email_element.send_keys(Keys.ENTER)
+    time.sleep(1)
 
 
 @application.route('/savepdf', methods = ['POST'])
@@ -92,22 +101,8 @@ def savepdf(url="", emailad="", emailpass=""):
     url, id_ = normalize_url(url)
     browser = setup_browser()
     load_first_page(browser, url)
-    send_email(browser, emailad)
+    send_auth(browser, emailad, emailpass)
 
-    # Check if there's password input
-    
-    try:
-        pass_ID = browser.find_element_by_name('visitor[passcode]')
-        pass_ID.send_keys(emailpass)
-    except:
-        print("no password required")
-    time.sleep(1)    
-    try:
-        email_ID.send_keys(Keys.TAB)
-        email_ID.send_keys(Keys.ENTER)
-    except:
-        print("ae")
-    
     exitflag = 0
     browser.switch_to_active_element().send_keys(Keys.RIGHT)
     
