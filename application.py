@@ -38,22 +38,32 @@ def setup_browser():
     return webdriver.Chrome(driver_path, chrome_options=chrome_options)
 
 
+class ApplicationError(Exception):
+    pass
+
+
+def normalize_url(url_or_id):
+    if 'docsend.com/view' in url_or_id:
+        loc = str.find(url_or_id, "view")
+        id_ = url_or_id[loc + 5:]
+    elif url_or_id.isalnum():
+        id_ = url_or_id
+    else:
+        raise ApplicationError(f"`{url_or_id}` is not a valid url or id")
+    return f'https://docsend.com/view/{id_}', id_
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
     # Check if it exists
-    url = request.form['url'].encode("ascii")
+    url = request.form['url']
     emailad = request.form['emailad'].encode("ascii")
     emailpass = request.form['emailpass'].encode("ascii")
 
-    loc = url.rfind('/')
-    idname = url[24+1:]+'.pdf'
-    
+    url, id_ = normalize_url(url)
     browser = setup_browser()
 
-    loc = str.find(url,"view")
-    ID = url[loc+5:]
-    
     browser.get(url)
     time.sleep(2)
     try:
@@ -140,7 +150,7 @@ def savepdf(url="", emailad="", emailpass=""):
 
     # now serve the PDF
     response = make_response(pdf.output(dest='S'))
-    response.headers.set('Content-Disposition', 'attachment', filename=ID + '.pdf')
+    response.headers.set('Content-Disposition', 'attachment', filename=id_ + '.pdf')
     response.headers.set('Content-Type', 'application/pdf')
     return response
 
