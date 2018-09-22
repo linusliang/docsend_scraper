@@ -171,4 +171,6 @@ def serve_front_page():
 # run the app.
 if __name__ == "__main__":
     application.debug = DEBUG_FLAG
+    if DEBUG_FLAG:
+        logging.root.setLevel(logging.DEBUG)
     application.run(host='0.0.0.0')
