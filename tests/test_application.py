@@ -4,9 +4,9 @@ from application import normalize_url, ApplicationError
 
 
 @pytest.mark.parametrize("input_,expected",[
-    ('https://docsend.com/view/p8jxsqr', 'https://docsend.com/view/p8jxsqr'),
-    ('docsend.com/view/p8jxsqr', 'https://docsend.com/view/p8jxsqr'),
-    ('p8jxsqr', 'https://docsend.com/view/p8jxsqr')
+    ('https://docsend.com/view/p8jxsqr', ('https://docsend.com/view/p8jxsqr', 'p8jxsqr')),
+    ('docsend.com/view/p8jxsqr', ('https://docsend.com/view/p8jxsqr', 'p8jxsqr')),
+    ('p8jxsqr', ('https://docsend.com/view/p8jxsqr', 'p8jxsqr'))
 ])
 def test_normalize_url_good(input_, expected):
     assert normalize_url(input_) == expected

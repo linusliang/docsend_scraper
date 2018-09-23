@@ -65,7 +65,7 @@ def load_first_page(browser, url):
         element = WebDriverWait(browser, 4).until(
             EC.presence_of_element_located((By.ID, "youtube-modal"))
         )
-    except TimeoutException as err:
+    except TimeoutException:
         logging.error("failed")
         if browser.title == '404 Page Not Found':
             raise ApplicationError(f'`{browser.current_url}` returned a 404')
@@ -127,6 +127,25 @@ def save_pages(req_id, browser, urls):
     return image_paths
 
 
+def generate_pdf(image_paths):
+    """Take the images and create a PDF"""
+    if not image_paths:
+        raise ApplicationError("No images")
+    im = Image.open(image_paths[0])
+    wheight = im.size[0]
+    wwidth = im.size[1]
+    im.close()
+
+    pdf = FPDF("L", "pt", [wwidth, wheight])
+    pdf.set_margins(0, 0, 0)
+
+    for image_path in image_paths:
+        pdf.add_page()
+        pdf.image(image_path, 0, 0, w=wwidth)
+        return pdf
+    return pdf
+
+
 @application.route('/savepdf', methods = ['POST'])
 def savepdf(url="", emailad="", emailpass=""):
 
@@ -141,24 +160,13 @@ def savepdf(url="", emailad="", emailpass=""):
     send_auth(browser, emailad, emailpass)
     urls = load_pages(browser)
     image_paths = save_pages(req_id, browser, urls)
+    pdf = generate_pdf(image_paths)
 
-    im = Image.open(image_paths[0])
-    wheight = im.size[0]
-    wwidth = im.size[1]
-    im.close()
-    
-    pdf = FPDF("L","pt",[wwidth,wheight])
-    pdf.set_margins(0,0,0)
-    
-    for image in image_paths:
-        pdf.add_page()
-        pdf.image(image,0,0)
-        
     for i in (image_paths):
         os.remove(i)
-    
-    cdir = os.getcwd()        
-    browser.close()  
+
+    cdir = os.getcwd()
+    browser.close()
 
     # now serve the PDF
     response = make_response(pdf.output(dest='S'))
