@@ -10,7 +10,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options  
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from flask_bootstrap import Bootstrap
 from fpdf import FPDF
@@ -20,7 +20,7 @@ from PIL import Image, ImageChops
 # Setting debug to True enables debug output.
 DEBUG_FLAG = bool(os.getenv("DEBUG"))
 VERBOSE_FLAG = bool(os.getenv("VERBOSE", True))
-IMAGE_DIR = os.getenv("IMAGE_DIR", os.path.join(os.getcwd(),'images'))
+IMAGE_DIR = os.getenv("IMAGE_DIR", os.path.join(os.getcwd(), 'images'))
 INFO_NAMESPACE = '/info'
 LOGGER = logging.getLogger('docsend_scraper')
 logging.basicConfig()
@@ -35,7 +35,7 @@ socketio = SocketIO(application)
 
 
 def trim(im):
-    bg = Image.new(im.mode, im.size, im.getpixel((50,50)))
+    bg = Image.new(im.mode, im.size, im.getpixel((50, 50)))
     diff = ImageChops.difference(im, bg)
     diff = ImageChops.add(diff, diff, 2.0, -10)
     bbox = diff.getbbox()
@@ -123,7 +123,8 @@ def save_pages(req_id, browser, urls):
     """Save each page as a png and return a list of paths to the saved images"""
     image_paths = []
     for page_num, url in enumerate(urls, 1):
-        socketio.emit("page update", {'page': page_num}, namespace=INFO_NAMESPACE, room=req_id)
+        socketio.emit("page update", {'page': page_num},
+                      namespace=INFO_NAMESPACE, room=req_id)
         browser.get(url)
         image_path = f"{IMAGE_DIR}/{req_id}_{page_num}.png"
         socketio.sleep(1)
@@ -149,14 +150,16 @@ def generate_pdf(req_id, image_paths):
     pdf.set_margins(0, 0, 0)
 
     for page_num, image_path in enumerate(image_paths, 1):
-        socketio.emit("page update", {'page': page_num}, namespace=INFO_NAMESPACE, room=req_id)
+        socketio.emit("page update", {'page': page_num},
+                      namespace=INFO_NAMESPACE, room=req_id)
         pdf.add_page()
         pdf.image(image_path, 0, 0)
     return pdf
 
 
 def stage_update(req_id, stage):
-    socketio.emit('stage update', {'stage': stage}, namespace=INFO_NAMESPACE, room=req_id)
+    socketio.emit('stage update', {'stage': stage},
+                  namespace=INFO_NAMESPACE, room=req_id)
     LOGGER.info("stage updated: %s request: %s", stage, str(req_id))
 
 
@@ -204,7 +207,8 @@ def savepdf():
                       namespace=INFO_NAMESPACE,
                       room=req_id)
     response = make_response(pdf.output(dest='S').encode('latin1'))
-    response.headers.set('Content-Disposition', 'attachment', filename=id_ + '.pdf')
+    response.headers.set('Content-Disposition',
+                         'attachment', filename=id_ + '.pdf')
     response.headers.set('Content-Type', 'application/pdf')
     return response
 
