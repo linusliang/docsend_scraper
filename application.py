@@ -1,7 +1,6 @@
 import os
 import platform
 import random
-import logging
 
 from flask import Flask, render_template, request, make_response
 from flask_socketio import SocketIO, join_room, emit
@@ -16,14 +15,14 @@ from flask_bootstrap import Bootstrap
 from fpdf import FPDF
 from PIL import Image, ImageChops
 
+from doc_scraper.logging import LOGGER, setup_logging
+
 
 # Setting debug to True enables debug output.
 DEBUG_FLAG = bool(os.getenv("DEBUG"))
 VERBOSE_FLAG = bool(os.getenv("VERBOSE", True))
 IMAGE_DIR = os.getenv("IMAGE_DIR", os.path.join(os.getcwd(), 'images'))
 INFO_NAMESPACE = '/info'
-LOGGER = logging.getLogger('docsend_scraper')
-logging.basicConfig()
 
 
 # EB looks for an 'application' callable by default.
@@ -230,11 +229,6 @@ def join(message):
 # run the app.
 if __name__ == "__main__":
     application.debug = DEBUG_FLAG
-    logging.root.setLevel(logging.INFO)
-    if DEBUG_FLAG or VERBOSE_FLAG:
-        LOGGER.setLevel(logging.DEBUG)
-    else:
-        logging.getLogger('engineio').setLevel(logging.WARN)
-        logging.getLogger('socketio').setLevel(logging.WARN)
+    setup_logging(DEBUG_FLAG, VERBOSE_FLAG)
     os.makedirs(IMAGE_DIR, exist_ok=True)
     socketio.run(application, host='0.0.0.0', debug=DEBUG_FLAG)
