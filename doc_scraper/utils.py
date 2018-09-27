@@ -1,7 +1,12 @@
 from PIL import Image, ImageChops
 
 from doc_scraper.errors import ApplicationError
+from doc_scraper.extensions import socketio
+from doc_scraper.logging import LOGGER
+from doc_scraper.settings import INFO_NAMESPACE
 
+
+sleep = socketio.sleep
 
 def normalize_url(url_or_id):
     if 'docsend.com/view' in url_or_id:
@@ -21,3 +26,15 @@ def trim(im):
     bbox = diff.getbbox()
     if bbox:
         return im.crop(bbox)
+
+
+def stage_update(req_id, stage):
+    socketio.emit('stage update', {'stage': stage},
+                  namespace=INFO_NAMESPACE, room=req_id)
+    LOGGER.info("stage updated: %s request: %s", stage, req_id)
+
+
+def page_update(req_id, page_num):
+    socketio.emit('page update', {'page': page_num},
+                  namespace=INFO_NAMESPACE, room=req_id)
+    LOGGER.info("page updated: %s request: %s", page_num, req_id)

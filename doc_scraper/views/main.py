@@ -3,9 +3,9 @@ from flask import request, render_template, make_response, Blueprint
 from doc_scraper.extensions import socketio
 from doc_scraper.settings import INFO_NAMESPACE
 from doc_scraper.errors import ApplicationError
-from doc_scraper.utils import normalize_url
-from doc_scraper.logic import run_job
 from doc_scraper.logging import LOGGER
+from doc_scraper.slidedeck import SlideDeck
+from doc_scraper.settings import IMAGE_DIR, DEBUG
 
 
 blueprint = Blueprint('main', __name__, template_folder='templates')
@@ -16,11 +16,11 @@ def savepdf():
     emailad = request.form['emailad'].encode("ascii")
     emailpass = request.form['emailpass'].encode("ascii")
     req_id = request.form['id']
-    id_ = url
-    pdf = None
+    id_ = url[25:]
     try:
-        url, id_ = normalize_url(url)
-        pdf = run_job(req_id, url, emailad, emailpass)
+        slidedeck = SlideDeck(url, emailad, emailpass, IMAGE_DIR, DEBUG)
+        pdf = slidedeck.convert_to_pdf(req_id)
+        id_ = slidedeck.id_
         response = make_response(pdf.output(dest='S').encode('latin1'))
     except ApplicationError as err:
         LOGGER.error(err.args[0])
