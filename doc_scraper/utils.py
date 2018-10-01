@@ -6,8 +6,6 @@ from doc_scraper.logging import LOGGER
 from doc_scraper.settings import INFO_NAMESPACE
 
 
-sleep = socketio.sleep
-
 def normalize_url(url_or_id):
     if 'docsend.com/view' in url_or_id:
         loc = str.find(url_or_id, "view")

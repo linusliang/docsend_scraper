@@ -5,7 +5,7 @@ from doc_scraper.settings import INFO_NAMESPACE
 from doc_scraper.errors import ApplicationError
 from doc_scraper.logging import LOGGER
 from doc_scraper.slidedeck import SlideDeck
-from doc_scraper.settings import IMAGE_DIR, DEBUG
+from doc_scraper.settings import IMAGE_DIR
 
 
 blueprint = Blueprint('main', __name__, template_folder='templates')
@@ -18,7 +18,7 @@ def savepdf():
     req_id = request.form['id']
     id_ = url[25:]
     try:
-        slidedeck = SlideDeck(url, emailad, emailpass, IMAGE_DIR, DEBUG)
+        slidedeck = SlideDeck(url, emailad, emailpass, IMAGE_DIR)
         pdf = slidedeck.convert_to_pdf(req_id)
         id_ = slidedeck.id_
         response = make_response(pdf.output(dest='S').encode('latin1'))
