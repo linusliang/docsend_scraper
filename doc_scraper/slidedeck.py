@@ -6,7 +6,7 @@ from requests import Session
 from bs4 import BeautifulSoup
 
 from doc_scraper.utils import stage_update, page_update
-from doc_scraper.logging import LOGGER
+from doc_scraper.logger import LOGGER
 from doc_scraper.errors import ApplicationError
 from doc_scraper.utils import normalize_url, trim
 

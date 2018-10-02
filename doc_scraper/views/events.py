@@ -3,7 +3,7 @@ from flask_socketio import join_room
 
 from doc_scraper.extensions import socketio
 from doc_scraper.settings import INFO_NAMESPACE
-from doc_scraper.logging import LOGGER
+from doc_scraper.logger import LOGGER
 
 
 @socketio.on("join", namespace=INFO_NAMESPACE)

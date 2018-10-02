@@ -2,7 +2,7 @@ from PIL import Image, ImageChops
 
 from doc_scraper.errors import ApplicationError
 from doc_scraper.extensions import socketio
-from doc_scraper.logging import LOGGER
+from doc_scraper.logger import LOGGER
 from doc_scraper.settings import INFO_NAMESPACE
 
 

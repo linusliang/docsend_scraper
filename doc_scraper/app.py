@@ -2,7 +2,7 @@ from flask import Flask
 
 import doc_scraper.views as views
 from doc_scraper.extensions import socketio, bootstrap
-from doc_scraper.logging import setup_logging
+from doc_scraper.logger import setup_logging
 from doc_scraper.settings import DEBUG
 
 
