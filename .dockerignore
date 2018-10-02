@@ -1,0 +1,9 @@
+.elasticbeanstalk
+.eggs
+.pytest_cache
+api.egg-info
+build
+dist
+tests
+images
+.git

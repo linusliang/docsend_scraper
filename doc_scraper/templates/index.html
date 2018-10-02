@@ -1,0 +1,105 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}DocSend Scraper - Beta{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% endblock %}
+
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+
+<script>
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+var uid = uuidv4();
+$(document).ready(function(){
+  $('.id-field').val(uid);
+  var infosocket = io.connect('http://' + document.domain + ':' + location.port + '/info');
+
+
+  infosocket.on('connect', function() {
+    infosocket.emit('join', {room:uid})
+  });
+
+  infosocket.on('stage update', function(msg) {
+    $('#stagetext').html(msg.stage);
+    $('#pagetext').html("");
+    $('#errortext').html("");
+
+    if(msg.stage === "done") {
+      $('.btn').button('reset');
+    }
+  });
+
+  infosocket.on('page update', function(msg) {
+    $('#pagetext').html(msg.page);
+  });
+
+  infosocket.on('error update', function(msg) {
+    $('#errortext').html(msg.detail);
+    $('#stagetext').html("Error");
+    $('.btn').button('reset')
+  });
+
+  $('.btn').on('click', function(event) {
+    var $this = $(this);
+    if (url.checkValidity()) {
+      $this.button('loading');
+      $('#stagetext').html("processing");
+      $('#errortext').html("");
+   }
+  });
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h3 align=center>DocSend Scraper (Beta)</h3>
+  <form class="form-horizontal" action="/savepdf" method="post">
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="email">Link:</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="url" placeholder="enter link, i.e. https://docsend.com/view/p8jxsqr" name="url" required pattern="^https?://docsend.com/view/.+">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="pwd">Email Address:</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="emailad" placeholder="enter email if needed ..." name="emailad">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="pwd">Docsend Password:</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="emailpass" placeholder="enter password if needed ..." name="emailpass">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-primary btn-med" id="load" data-loading-text="Scraping, every slide takes 3 seconds so your download will begin shortly!">Scrape</button>
+      </div>
+    </div>
+    <input type="hidden" class="id-field" name="id" id="id" value="" />
+  </form>
+  <div id="info">
+    <div>
+      Stage: <span id="stagetext" class="stage-info"></span>
+    </div>
+    <div>
+      Page: <span id="pagetext" class="page-info"></span>
+    </div>
+    <div>
+    Error: <span id="errortext" class="error-info"></span>
+    </div>
+  </div>
+</div>
+{% endblock %}
