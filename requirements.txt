@@ -1,5 +1,4 @@
 beautifulsoup4==4.6.3
-click==6.7
 environs==4.0.0
 Flask==1.0.2
 flask_bootstrap
@@ -7,10 +6,6 @@ flask_socketio==3.0.2
 fpdf==1.7.2
 gevent-websocket
 image==1.5.24
-itsdangerous==0.24
 Jinja2==2.10
-MarkupSafe==1.0
 Pillow==5.1.0
-pytz==2018.4
 requests==2.19.1
-Werkzeug==0.14.1
