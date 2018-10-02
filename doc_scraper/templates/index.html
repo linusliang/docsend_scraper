@@ -44,6 +44,7 @@ $(document).ready(function(){
 
   infosocket.on('error update', function(msg) {
     $('#errortext').html(msg.detail);
+    $('#stagetext').html("Error");
     $('.btn').button('reset')
   });
 
@@ -51,7 +52,9 @@ $(document).ready(function(){
     var $this = $(this);
     if (url.checkValidity()) {
       $this.button('loading');
-    }
+      $('#stagetext').html("processing");
+      $('#errortext').html("");
+   }
   });
 });
 </script>
